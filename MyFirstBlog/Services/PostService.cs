@@ -9,6 +9,7 @@ public interface IPostService
 {
     IEnumerable<PostDto> GetPosts();
     PostDto GetPost(String slug);
+    PostDto CreatePost(CreatePostDto newPost);
 }
 
 public class PostService : IPostService
@@ -30,8 +31,26 @@ public class PostService : IPostService
         return getPost(slug).AsDto();
     }
 
+    public PostDto CreatePost(CreatePostDto newPost)
+    {
+        var post = new Post
+        {
+            Id = Guid.NewGuid(),
+            Title = newPost.Title,
+            Body = newPost.Description,
+            Slug = Guid.NewGuid().ToString(),
+            CreatedDate = DateTime.UtcNow
+        };
+
+        _context.Posts.Add(post);
+        _context.SaveChanges();
+
+        return post.AsDto();
+    }
+
     private Post getPost(string slug)
     {
-        return _context.Posts.Where(a=>a.Slug==slug.ToString()).SingleOrDefault();
+        return _context.Posts.Where(a => a.Slug == slug.ToString()).SingleOrDefault();
     }
 }
+
